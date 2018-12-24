@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2018-12-21T06:22:55.652Z</updated>
+  <updated>2018-12-24T04:36:23.937Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,83 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Java实现生命游戏</title>
+    <link href="http://yoursite.com/2018/12/24/java%E5%AE%9E%E7%8E%B0%E7%94%9F%E5%91%BD%E6%B8%B8%E6%88%8F/"/>
+    <id>http://yoursite.com/2018/12/24/java实现生命游戏/</id>
+    <published>2018-12-24T04:26:05.901Z</published>
+    <updated>2018-12-24T04:36:23.937Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="一、分析与思考"><a href="#一、分析与思考" class="headerlink" title="一、分析与思考"></a>一、分析与思考</h3><p>软件工程实验课第一节课让用java做了一个比较简单的程序-生命游戏</p><h4 id="1-游戏规则"><a href="#1-游戏规则" class="headerlink" title="1.  游戏规则"></a>1.  游戏规则</h4><p>生命游戏在初始化之后，按照以下规则不断演化繁殖：每个细胞的‘生’或‘死’由它8个邻居细胞的状态决定。<br><img src="1.gif" alt="测试"><br>（1）“人口过少”：任何活细胞如果活邻居少于2个，则死亡。<br>（2）“正常”：任何活细胞如果活邻居为2个或3个，则继续活着。<br>（3）“人口过多”：任何活细胞如果活邻居大于3个，则死亡。<br>（4）“繁殖”：任何死细胞如果活邻居正好是3个，则活过来。</p><h4 id="2-分析"><a href="#2-分析" class="headerlink" title="2. 分析"></a>2. 分析</h4><p>上述四步描述其实在算法中体现用三步描述即可<br>（1）如果活邻居等于3个，无论自己原来生死，都为活。<br>（2）如果活邻居等于2个且自己原来为生，则继续为生<br>（3） 其他，均为死。</p><h3 id="二、代码实现"><a href="#二、代码实现" class="headerlink" title="二、代码实现"></a>二、代码实现</h3><h4 id="1-简单分层"><a href="#1-简单分层" class="headerlink" title="1. 简单分层"></a>1. 简单分层</h4><p>因为这个小程序要体现软件工程的分层结构，因此，先根据思路，我把结构分为data层，service层，和应用层<br><img src="2.png" alt="这里写图片描述"><br>data层存放细胞数组类，service层存放算法逻辑，lifeGame应用层主要是界面的实现和启动</p><h4 id="2-核心代码"><a href="#2-核心代码" class="headerlink" title="2.核心代码"></a>2.核心代码</h4><h5 id="1-细胞生死即细胞矩阵的变化"><a href="#1-细胞生死即细胞矩阵的变化" class="headerlink" title="1. 细胞生死即细胞矩阵的变化"></a>1. 细胞生死即细胞矩阵的变化</h5><figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">public <span class="keyword">static</span> CellArray <span class="keyword">generate</span>(CellArray cells) &#123;</span><br><span class="line">CellArray nextCells=<span class="keyword">new</span> CellArray(cells<span class="variable">.getRow</span>(),cells<span class="variable">.getCol</span>());</span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;nextCells<span class="variable">.getRow</span>();i++) </span><br><span class="line">  <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;nextCells<span class="variable">.getCol</span>();j++) &#123;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">int</span> count=countNumber(cells,i,j);<span class="comment">//获取周围邻居数目</span></span><br><span class="line"> <span class="keyword">if</span>(count==<span class="number">3</span>) &#123;</span><br><span class="line"> nextCells<span class="variable">.setCell</span>(i, j, CellState<span class="variable">.LIVE</span><span class="variable">.getValue</span>());<span class="comment">//如果为三，活</span></span><br><span class="line"> &#125;</span><br><span class="line"> <span class="keyword">else</span> <span class="keyword">if</span>(count==<span class="number">2</span>&amp;&amp;cells<span class="variable">.getCell</span>(i, j)==CellState<span class="variable">.LIVE</span><span class="variable">.getValue</span>()) &#123;</span><br><span class="line"> nextCells<span class="variable">.setCell</span>(i, j, CellState<span class="variable">.LIVE</span><span class="variable">.getValue</span>());<span class="comment">//如果为二且为生，则生</span></span><br><span class="line"> &#125;</span><br><span class="line"> <span class="keyword">else</span> &#123;</span><br><span class="line"> nextCells<span class="variable">.setCell</span>(i, j, CellState<span class="variable">.DEAD</span><span class="variable">.getValue</span>());<span class="comment">//其他为死</span></span><br><span class="line"> &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span>  nextCells;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h5 id="2-定时器"><a href="#2-定时器" class="headerlink" title="2. 定时器"></a>2. 定时器</h5><p>定时器是用来每过一段时间就更新细胞矩阵<br><figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">Timer timer = new Timer();</span><br><span class="line">timer.schedule(new TimerTask() &#123;</span><br><span class="line">@Override</span><br><span class="line">public void run() &#123;</span><br><span class="line">cells = GameService.generate(cells);</span><br><span class="line">++generation;</span><br><span class="line">label2.setText(<span class="string">"繁衍代数："</span> + generation);</span><br><span class="line"><span class="keyword">for</span> (int <span class="built_in">i</span> = <span class="number">0</span>; <span class="built_in">i</span> &lt; row; <span class="built_in">i</span>++) &#123;</span><br><span class="line"><span class="keyword">for</span> (int <span class="built_in">j</span> = <span class="number">0</span>; <span class="built_in">j</span> &lt; col; <span class="built_in">j</span>++) &#123;</span><br><span class="line"><span class="keyword">if</span> (cells.getCell(<span class="built_in">i</span>, <span class="built_in">j</span>) == CellState.LIVE.getValue()) &#123;</span><br><span class="line">btns[<span class="built_in">i</span>][<span class="built_in">j</span>].setBackground(Color.black);</span><br><span class="line"></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">btns[<span class="built_in">i</span>][<span class="built_in">j</span>].setBackground(Color.white);</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">&#125;, <span class="number">0</span>, <span class="number">500</span>);</span><br></pre></td></tr></table></figure></p><h3 id="三、实现效果"><a href="#三、实现效果" class="headerlink" title="三、实现效果"></a>三、实现效果</h3><p><img src="3.png" alt="这里写图片描述"><br><img src="4.png" alt="这里写图片描述"></p><p>###四、源码<br><a href="https://download.csdn.net/download/hanzhenbushihu/10662798" target="_blank" rel="noopener">https://download.csdn.net/download/hanzhenbushihu/10662798</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;一、分析与思考&quot;&gt;&lt;a href=&quot;#一、分析与思考&quot; class=&quot;headerlink&quot; title=&quot;一、分析与思考&quot;&gt;&lt;/a&gt;一、分析与思考&lt;/h3&gt;&lt;p&gt;软件工程实验课第一节课让用java做了一个比较简单的程序-生命游戏&lt;/p&gt;
+&lt;h4 id=&quot;1-游戏
+      
+    
+    </summary>
+    
+      <category term="java编程" scheme="http://yoursite.com/categories/java%E7%BC%96%E7%A8%8B/"/>
+    
+    
+      <category term="java" scheme="http://yoursite.com/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>以字节流接受键盘输入后写入文件，并以缓冲字节流复制文件</title>
+    <link href="http://yoursite.com/2018/12/24/%E4%BB%A5%E5%AD%97%E8%8A%82%E6%B5%81%E6%8E%A5%E5%8F%97%E9%94%AE%E7%9B%98%E8%BE%93%E5%85%A5%E5%90%8E%E5%86%99%E5%85%A5%E6%96%87%E4%BB%B6%EF%BC%8C%E5%B9%B6%E4%BB%A5%E7%BC%93%E5%86%B2%E5%AD%97%E8%8A%82%E6%B5%81%E5%A4%8D%E5%88%B6%E6%96%87%E4%BB%B6/"/>
+    <id>http://yoursite.com/2018/12/24/以字节流接受键盘输入后写入文件，并以缓冲字节流复制文件/</id>
+    <published>2018-12-24T04:19:41.242Z</published>
+    <updated>2018-12-24T04:38:16.914Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="一、代码及解释"><a href="#一、代码及解释" class="headerlink" title="一、代码及解释"></a>一、代码及解释</h3><figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.BufferedReader;</span><br><span class="line"><span class="keyword">import</span> java.io.BufferedWriter;</span><br><span class="line"><span class="keyword">import</span> java.io.<span class="keyword">File</span>;</span><br><span class="line"><span class="keyword">import</span> java.io.FileOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.FileReader;</span><br><span class="line"><span class="keyword">import</span> java.io.FileWriter;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> Main &#123;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> getValidLength(<span class="keyword">byte</span>[] bytes)&#123;<span class="comment">//获得缓存区中实际字节长</span></span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">null</span> == bytes || <span class="number">0</span> == bytes.length)</span><br><span class="line">        <span class="keyword">return</span> i ;</span><br><span class="line">    <span class="keyword">for</span> (; i &lt; bytes.length; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (bytes[i] == <span class="string">'\0'</span>||bytes[i] == <span class="string">'\n'</span>)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> i-<span class="number">1</span> ;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(String[] args) <span class="keyword">throws</span> IOException &#123;</span><br><span class="line"><span class="keyword">File</span> f1=<span class="keyword">new</span> <span class="keyword">File</span>(<span class="string">"E:\\mytext.txt"</span>);<span class="comment">//源文件</span></span><br><span class="line"><span class="keyword">File</span> f2=<span class="keyword">new</span> <span class="keyword">File</span>(<span class="string">"E:\\mynewtxt.txt"</span>);<span class="comment">//目标文件</span></span><br><span class="line"></span><br><span class="line">InputStream is=System.in;<span class="comment">//从键盘输入，以字节流</span></span><br><span class="line">FileOutputStream os=<span class="keyword">new</span> FileOutputStream(f1,<span class="keyword">true</span>);<span class="comment">//追加的形式</span></span><br><span class="line"><span class="keyword">byte</span> []bt=<span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span>];<span class="comment">//缓存字节数组</span></span><br><span class="line">is.<span class="keyword">read</span>(bt);<span class="comment">//读入数组</span></span><br><span class="line">os.<span class="keyword">write</span>(bt,<span class="number">0</span>,getValidLength(bt));<span class="comment">//写入时忽略的空的字节</span></span><br><span class="line"></span><br><span class="line">BufferedReader br=<span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> FileReader(f1));<span class="comment">//读源文件流</span></span><br><span class="line">BufferedWriter wr=<span class="keyword">new</span> BufferedWriter(<span class="keyword">new</span> FileWriter(f2));<span class="comment">//写源文件流</span></span><br><span class="line">String s1=<span class="keyword">null</span>;<span class="comment">//缓存字符串</span></span><br><span class="line"><span class="keyword">while</span>((s1=br.readLine())!=<span class="keyword">null</span>) &#123;<span class="comment">//写</span></span><br><span class="line">wr.<span class="keyword">write</span>(s1);<span class="comment">//写</span></span><br><span class="line">&#125;</span><br><span class="line">br.close();</span><br><span class="line">wr.close();</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="二、结果"><a href="#二、结果" class="headerlink" title="二、结果"></a>二、结果</h3><p><img src="1.png" alt="这里写图片描述"><br><img src="2.png" alt="这里写图片描述"></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;一、代码及解释&quot;&gt;&lt;a href=&quot;#一、代码及解释&quot; class=&quot;headerlink&quot; title=&quot;一、代码及解释&quot;&gt;&lt;/a&gt;一、代码及解释&lt;/h3&gt;&lt;figure class=&quot;highlight gradle&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class
+      
+    
+    </summary>
+    
+      <category term="java编程" scheme="http://yoursite.com/categories/java%E7%BC%96%E7%A8%8B/"/>
+    
+    
+      <category term="java" scheme="http://yoursite.com/tags/java/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Java按行读取并存到数组(转换成任意类型)（算法题目常用）</title>
+    <link href="http://yoursite.com/2018/12/24/java%E6%8C%89%E8%A1%8C%E8%AF%BB%E5%8F%96%E5%B9%B6%E5%AD%98%E5%88%B0%E6%95%B0%E7%BB%84(%E8%BD%AC%E6%8D%A2%E6%88%90%E4%BB%BB%E6%84%8F%E7%B1%BB%E5%9E%8B)%EF%BC%88%E7%AE%97%E6%B3%95%E9%A2%98%E7%9B%AE%E5%B8%B8%E7%94%A8%EF%BC%89/"/>
+    <id>http://yoursite.com/2018/12/24/java按行读取并存到数组(转换成任意类型)（算法题目常用）/</id>
+    <published>2018-12-24T04:07:29.349Z</published>
+    <updated>2018-12-24T04:14:17.661Z</updated>
+    
+    <content type="html"><![CDATA[<ul><li>做用java做算法时，需要进行.txt文件的读写问题。<br>思考：现在知道如何用读每行的数据的，怎么把他们分开？<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//从文件中读取</span></span><br><span class="line">File inFile=<span class="keyword">new</span> <span class="type">File</span>(<span class="string">"E:\\input.txt"</span>);</span><br><span class="line">BufferedReader  br=<span class="keyword">new</span> <span class="type">BufferedReader</span>(<span class="keyword">new</span> <span class="type">FileReader</span>(inFile));</span><br><span class="line"><span class="keyword">String</span> firstLine=br.readLine();<span class="comment">//读取一行，  </span></span><br><span class="line">以后使用一次就会读取一次，且读取数据为<span class="keyword">String</span> 类型</span><br><span class="line"><span class="keyword">String</span> arrs[]=as.split(<span class="string">" "</span>);<span class="comment">//用于读取以空格为间隔的数据，此时，数据均匀的存在字符串数组中</span></span><br><span class="line"><span class="comment">//然后循环转型赋值</span></span><br></pre></td></tr></table></figure></li></ul><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//写入文件</span></span><br><span class="line"><span class="built_in">File</span> outFile=<span class="keyword">new</span> <span class="built_in">File</span>(<span class="string">"E:\\output.txt"</span>);</span><br><span class="line">BufferedWriter writer = <span class="keyword">new</span> BufferedWriter(<span class="keyword">new</span> FileWriter(outFile));</span><br><span class="line"><span class="keyword">String</span> s=<span class="keyword">String</span>.valueOf(data);</span><br><span class="line">writer.<span class="built_in">write</span>(s);</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;ul&gt;
+&lt;li&gt;做用java做算法时，需要进行.txt文件的读写问题。&lt;br&gt;思考：现在知道如何用读每行的数据的，怎么把他们分开？&lt;figure class=&quot;highlight haxe&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span cl
+      
+    
+    </summary>
+    
+      <category term="java 编程" scheme="http://yoursite.com/categories/java-%E7%BC%96%E7%A8%8B/"/>
+    
+    
+      <category term="java" scheme="http://yoursite.com/tags/java/"/>
+    
+  </entry>
   
   <entry>
     <title>面试常见问题整理</title>
@@ -46,7 +123,7 @@
     <link href="http://yoursite.com/2018/12/21/%E5%AD%97%E8%8A%82%E8%B7%B3%E5%8A%A8%E9%9D%A2%E8%AF%95%E7%BB%8F%E5%8E%86/"/>
     <id>http://yoursite.com/2018/12/21/字节跳动面试经历/</id>
     <published>2018-12-21T04:09:09.000Z</published>
-    <updated>2018-12-21T04:35:09.326Z</updated>
+    <updated>2018-12-21T06:24:32.253Z</updated>
     
     <summary type="html">
     
